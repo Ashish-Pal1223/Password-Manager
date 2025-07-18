@@ -2,14 +2,8 @@ import java.util.Scanner;
 import java.util.HashMap;
 
 class PasswordManagerDriver{
-	static User newAccount(String username, String password){
-		User newUser = new User();
-		newUser.setUserName(username);
-		newUser.setPassword(password);
-		return newUser;
-	}
 	
-	static void userMenu(User crntUser){
+	static void userMenu(User crntUser, String masterPassword){
 		boolean running = true;
 		String website = "";
 		String username = "";
@@ -19,7 +13,9 @@ class PasswordManagerDriver{
 			System.out.println("----------Welcome " + crntUser.getUserName() + "----------");
 			System.out.println("1.Enter new password");
 			System.out.println("2.Show all password");
-			System.out.println("3.log out");
+			System.out.println("3.Update password");
+			System.out.println("4.Delete Password");
+			System.out.println("5.log out");
 			System.out.println();
 			System.out.print("Enter you choice : ");
 			
@@ -36,14 +32,30 @@ class PasswordManagerDriver{
 					username = sc.nextLine();
 					System.out.print("password : ");
 					password = sc.nextLine();
-					crntUser.enterCredentials(website, username, password);
+					crntUser.enterCredentials(website, username, password, masterPassword);
 					break;
 				
 				case 2:
-					crntUser.showCredentials();
+					crntUser.showCredentials(masterPassword);
 					break;
 					
 				case 3:
+					System.out.print("Website name : ");
+					website = sc.nextLine();
+					System.out.print("username : ");
+					username = sc.nextLine();
+					System.out.print("password : ");
+					password = sc.nextLine();
+					crntUser.updateCredentials(website, username, password, masterPassword);
+					break;
+					
+				case 4:
+					System.out.print("Webiste name : ");
+					website = sc.nextLine();
+					crntUser.deleteCredentials(website);
+					break;
+					
+				case 5:
 					running = false;
 					break;
 					
@@ -56,9 +68,10 @@ class PasswordManagerDriver{
 
 	public static void main(String[] args){
 		HashMap<String, User> userList = new HashMap<>();
+		User.setUserCount();
 		Scanner sc = new Scanner(System.in);
 		String username = "";
-		String password = "";
+		String masterPassword = "";
 		
 		boolean running = true;
 		while(running){
@@ -80,9 +93,9 @@ class PasswordManagerDriver{
 					System.out.print("Enter Username : ");
 					username = sc.nextLine();
 					System.out.print("Enter Password : ");
-					password = sc.nextLine();
-					newUser = newAccount(username, password);
-					userList.put(username, newUser);
+					masterPassword = sc.nextLine();
+					newUser = new User(username, masterPassword);
+					DataStore.storeUserCredentials(newUser);
 					System.out.println("Account Created!");
 					System.out.println();
 					break;
@@ -92,22 +105,16 @@ class PasswordManagerDriver{
 					System.out.print("Enter username : ");
 					username = sc.nextLine();
 					System.out.print("Enter password : ");
-					password = sc.nextLine();
+					masterPassword = sc.nextLine();
 					System.out.println();
 					
-					if(userList.get(username) == null){
-						System.out.println("Invalid Username!");
-						System.out.println();
+					currentUser = User.validate(username, masterPassword);
+					
+					if(currentUser == null){
+						System.out.println("Invalid Username or password!");
 					}
 					else{
-						currentUser = userList.get(username);
-						if(!password.equals(currentUser.getUserPassword())){
-							System.out.println("Incorrect Password!");
-							System.out.println();
-						}
-						else{
-							userMenu(currentUser);
-						}
+						userMenu(currentUser, masterPassword);
 					}
 					
 					break;

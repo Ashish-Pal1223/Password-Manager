@@ -1,4 +1,4 @@
-class UserPassword{
+public class UserPassword{
 	private int userId;
 	private String website;
 	private String username;
@@ -9,6 +9,10 @@ class UserPassword{
 		this.website = website;
 		this.username = username;
 		this.password = password;
+	}
+	
+	public int getUserId(){
+		return userId;
 	}
 	
 	public String getWebsite(){
